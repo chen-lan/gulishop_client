@@ -3,17 +3,27 @@
 		<!-- 头部的第一行 -->
 		<div class="top">
 			<div class="container">
-				<div class="loginList">
+				<div class="loginList" v-if="Object.keys(userInfo).length === 0">
 					<p>尚品汇欢迎您！</p>
 					<p>
 						<span>请</span>
 						<router-link to="/login">登录</router-link>
 						<router-link to="/register" class="register">免费注册</router-link>
+						<!-- <router-link to="/test" class="register">test</router-link> -->
+					</p>
+				</div>
+				<div class="loginList" v-else>
+					<p>尚品汇欢迎您！</p>
+					<p>
+						<span>请</span>
+						<router-link to="/login">用户名：{{ userInfo.name }}</router-link>
+						<a class="register" @click="userLogout">退出登录</a>
+						<!-- <router-link to="/test" class="register">test</router-link> -->
 					</p>
 				</div>
 				<div class="typeList">
-					<a href="###">我的订单</a>
-					<a href="###">我的购物车</a>
+					<router-link to="/center">我的订单</router-link>
+					<router-link to="/shopcart">我的购物车</router-link>
 					<a href="###">我的尚品汇</a>
 					<a href="###">尚品汇会员</a>
 					<a href="###">企业采购</a>
@@ -39,12 +49,19 @@
 </template>
 
 <script>
+import { reqUserLogout } from "@/api";
+import { mapState } from "vuex";
 export default {
 	name: "Header",
 	data() {
 		return {
 			keyword: undefined,
 		};
+	},
+	computed: {
+		...mapState({
+			userInfo: state => state.user.userInfo,
+		}),
 	},
 	methods: {
 		keywordSearch() {
@@ -56,16 +73,27 @@ export default {
 			 * 解决方案2：在this.$router.push({},resolve/reject)
 			 * 解决方案3：在this.$router.push({}).catch(){}捕获异常
 			 */
+			if (this.keyword === "") this.keyword = undefined;
 			this.$router.push({
-				path: "/search",
 				params: {
 					keyword: this.keyword,
 				},
-				query: {
-					keyword1: this.keyword,
-				},
+				query: this.$route.query,
 				name: "search",
 			});
+		},
+		async userLogout() {
+			try {
+				await this.$store.dispatch("userLogout");
+				// 将token和userInfo清空
+				this.$store.state.user.token = "";
+				this.$store.state.user.userInfo = {};
+				localStorage.removeItem("token");
+				// 点击退出登录跳转到首页
+				this.$router.push("/home");
+			} catch (error) {
+				alert("退出失败");
+			}
 		},
 	},
 };

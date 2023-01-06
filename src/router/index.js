@@ -1,10 +1,9 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import Search from "@/pages/Search";
+import routes from "@/router/routes";
+import store from "@/store";
 
+import { getUserInfo } from "@/utils/user";
 Vue.use(VueRouter);
 
 // 改造vue-router的方法，让其具有处理第二点击提交相同的内容报错问题
@@ -19,34 +18,45 @@ VueRouter.prototype.push = function (option, resolve, reject) {
 	}
 };
 
-export default new VueRouter({
-	routes: [
-		{
-			path: "/home",
-			component: Home,
-		},
-		{
-			path: "/login",
-			component: Login,
-		},
-		{
-			path: "/register",
-			component: Register,
-		},
-		{
-			path: "/search/:keyword?",
-			component: Search,
-			name: "search",
-			props(route) {
-				return {
-					keyword: route.params.keyword,
-					keyword1: route.query.keyword1,
-				};
-			},
-		},
-		{
-			path: "/",
-			redirect: "/home",
-		},
-	],
+const router = new VueRouter({
+	routes,
+	scrollBehavior() {
+		return { y: 0 };
+	},
 });
+
+// 路由全局守卫，当路由发生变化，就会执行该函数
+router.beforeEach(async (to, from, next) => {
+	// console.log("to", to);
+	// console.log("from", from);
+	// 获取token和userInfo的用户信息
+	const token = store.state.user.token;
+	// 有token值，说明已经登录了
+	if (token) {
+		// 已登录和刷新丢失userInfo数据时，重新获取用户登录信息
+		try {
+			await getUserInfo();
+			next();
+		} catch (error) {
+			localStorage.removeItem("token");
+			store.state.user.token = "";
+			if (to.path.indexOf("/trade") !== -1 || to.path.indexOf("/pay") !== -1 || to.path.indexOf("/center") !== -1) {
+				next(`/login?wantpath=${to.path}`);
+			}
+		}
+		// if (Object.keys(userInfo).length === 0) {
+		// 	console.log(1111);
+		// } else {
+		// 	console.log(2222);
+		// }
+	} else {
+		// 未登录状态
+		if (to.path.indexOf("/trade") !== -1 || to.path.indexOf("/pay") !== -1 || to.path.indexOf("/center") !== -1) {
+			next(`/login?wantpath=${to.path}`);
+		} else {
+			next();
+		}
+	}
+});
+
+export default router;
