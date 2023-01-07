@@ -13,4 +13,10 @@ module.exports = defineConfig({
 		},
 	},
 	lintOnSave: false,
+	pages: {
+		index: {
+			entry: "src/main.js", // 入口文件
+			title: "谷粒商城",
+		},
+	},
 });

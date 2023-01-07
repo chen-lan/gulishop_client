@@ -40,7 +40,12 @@ router.beforeEach(async (to, from, next) => {
 		} catch (error) {
 			localStorage.removeItem("token");
 			store.state.user.token = "";
-			if (to.path.indexOf("/trade") !== -1 || to.path.indexOf("/pay") !== -1 || to.path.indexOf("/center") !== -1) {
+			if (
+				to.path.indexOf("/trade") !== -1 ||
+				to.path.indexOf("/pay") !== -1 ||
+				to.path.indexOf("/center") !== -1 ||
+				to.path.indexOf("/home") !== -1
+			) {
 				next(`/login?wantpath=${to.path}`);
 			}
 		}

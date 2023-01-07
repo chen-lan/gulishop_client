@@ -56,10 +56,8 @@ export default [
 		component: Pay,
 		name: "pay",
 		beforeEnter: (to, from, next) => {
-			if (from.path.indexOf("/trade") !== -1) {
+			if (from.path.indexOf("/trade") !== -1 || from.path === "/" || from.path.indexOf("/login") !== -1) {
 				next();
-			} else if (from.path.indexOf("/login") !== -1) {
-				next("/");
 			} else {
 				next(false);
 			}
@@ -69,10 +67,8 @@ export default [
 		path: "/trade",
 		component: Trade,
 		beforeEnter: (to, from, next) => {
-			if (from.path.indexOf("/shopcart") !== -1) {
+			if (from.path.indexOf("/shopcart") !== -1 || from.path === "/" || from.path.indexOf("/login") !== -1) {
 				next();
-			} else if (from.path.indexOf("/login") !== -1) {
-				next("/");
 			} else {
 				next(false);
 			}
