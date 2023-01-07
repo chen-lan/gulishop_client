@@ -12,7 +12,7 @@
 							</div>
 							<div class="input-text clearFix">
 								<span class="pwd"></span>
-								<input type="text" placeholder="请输入密码" v-model="password" />
+								<input type="password" placeholder="请输入密码" v-model="password" />
 							</div>
 							<!-- 点击事件修饰符，prevent阻止默认行为，once只能点击一次，stop 阻止事件传播 -->
 							<button class="btn" @click.prevent="userLogin">登&nbsp;&nbsp;录</button>
